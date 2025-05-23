@@ -1,0 +1,89 @@
+/* Gradient background */
+.login-background {
+  min-height: 100vh;
+  background: linear-gradient(to right top, #1e1f26, #373d4c, #505c74, #6c7c9e, #8e9cc9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+/* Glass card style */
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  color: white;
+}
+
+.login-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Input styles */
+.form-group {
+  margin-bottom: 1.2rem;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  outline: none;
+  font-size: 1rem;
+}
+.form-group input::placeholder {
+  color: #ddd;
+}
+.form-group input:focus {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Button */
+.login-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: #00aaff;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.login-btn:hover {
+  background: #008ecc;
+}
+.login-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+.login-footer a {
+  color: #00aaff;
+  text-decoration: none;
+}
+.login-footer a:hover {
+  text-decoration: underline;
+}

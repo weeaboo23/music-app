@@ -1,0 +1,140 @@
+/* Dashboard.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+
+body, html {
+  font-family: 'Space Grotesk', sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #0f0f0f;
+}
+
+.dashboard-music-app {
+  height: 100vh;
+  background: linear-gradient(145deg, #1a1a1a, #0f0f0f),
+              url('https://images.unsplash.com/photo-1611078489923-7197f9290ba5?auto=format&fit=crop&w=1950&q=80') no-repeat center center / cover;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 8%;
+  position: relative;
+  overflow: hidden;
+}
+
+.overlay {
+  width: 100%;
+  z-index: 2;
+}
+
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1.2rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 3;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.top-bar h2 {
+  font-weight: 600;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.btn-logout {
+  background: transparent;
+  color: #ff4d4d;
+  border: 2px solid #ff4d4d;
+  font-weight: 600;
+  padding: 0.5rem 1.4rem;
+  border-radius: 30px;
+  transition: all 0.3s ease-in-out;
+  backdrop-filter: blur(5px);
+}
+
+.btn-logout:hover {
+  background-color: #ff4d4d;
+  color: white;
+  transform: scale(1.05);
+}
+
+.dashboard-center {
+  margin-top: 100px;
+  max-width: 640px;
+  text-align: left;
+}
+
+.dashboard-center h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.dashboard-center .lead {
+  font-size: 1.25rem;
+  color: #bbbbbb;
+  margin-bottom: 2.5rem;
+}
+
+.dashboard-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 1rem 2rem;
+  border-radius: 20px;
+  font-size: 1.15rem;
+  font-weight: 500;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-btn:hover {
+  background: linear-gradient(135deg, #1db954, #1ed760);
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(29, 185, 84, 0.3);
+}
+
+.dashboard-btn i {
+  font-size: 1.4rem;
+  margin-right: 0.7rem;
+}
+
+.dashboard-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+  transform: rotate(25deg);
+  transition: opacity 0.5s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dashboard-btn:hover::before {
+  opacity: 1;
+  animation: glow 2s infinite linear;
+}
+
+@keyframes glow {
+  from { transform: rotate(25deg) translateY(-10%); }
+  to { transform: rotate(25deg) translateY(10%); }
+}

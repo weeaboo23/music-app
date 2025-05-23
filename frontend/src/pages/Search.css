@@ -1,0 +1,12 @@
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.card-text {
+  font-size: 0.9rem;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f0f0f0;
+}
