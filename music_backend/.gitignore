@@ -1,1 +1,16 @@
 .env
+./music/__pycache__
+./music/migrations
+./music/tests/__pycache__
+./music/tests/migrations
+./music/tests/test_data
+./music/tests/test_data/__pycache__
+./music/tests/test_data/migrations
+./music/tests/test_data/migrations/__pycache__
+./music/tests/test_data/migrations/__pycache__/*
+./music/tests/test_data/migrations/__pycache__/*.py
+./music/tests/test_data/migrations/__pycache__/*.pyc
+./music/tests/test_data/migrations/__pycache__/*.pyo
+./music/tests/test_data/migrations/__pycache__/*.pyd
+./music/tests/test_data/migrations/__pycache__/*.pydc
+./music/tests/test_data/migrations/__pycache__/*.pydc.*

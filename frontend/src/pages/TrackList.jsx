@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import './TrackList.css';
 import axiosInstance from './axiosInstance';
+import { motion } from 'framer-motion';
 
 function TrackList() {
   const [uploadedTracks, setUploadedTracks] = useState([]);
@@ -9,30 +10,53 @@ function TrackList() {
   const [search, setSearch] = useState('');
   const [playingTrackId, setPlayingTrackId] = useState(null);
   const [editModal, setEditModal] = useState(null);
+  const [playlists, setPlaylists] = useState([]);
+  const [selectedTrackToAdd, setSelectedTrackToAdd] = useState(null);
 
   const audioRefs = useRef({});
   const token = localStorage.getItem('token');
 
+  const fetchAllTracks = async (url, useAuth = false) => {
+    const results = [];
+    let next = url;
+
+    while (next) {
+      const response = await (useAuth ? axiosInstance : axios).get(next, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      results.push(...response.data.results);
+      next = response.data.next;
+    }
+
+    return results;
+  };
+
   const fetchTracks = async () => {
     try {
-      const [uploadedRes, onlineRes] = await Promise.all([
-        axiosInstance.get(`http://localhost:8000/api/tracks/?search=${search}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get(`http://localhost:8000/api/online-tracks/?search=${search}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+      const [uploaded, online] = await Promise.all([
+        fetchAllTracks(`http://localhost:8000/api/tracks/?search=${search}`, true),
+        fetchAllTracks(`http://localhost:8000/api/online-tracks/?search=${search}`, false)
       ]);
 
-      setUploadedTracks(uploadedRes.data.results || []);
-      setOnlineTracks(onlineRes.data.results || []);
+      setUploadedTracks(uploaded);
+      setOnlineTracks(online);
     } catch (err) {
       console.error('Error fetching tracks:', err);
     }
   };
 
+  const fetchPlaylists = async () => {
+    try {
+      const res = await axiosInstance.get('http://localhost:8000/api/playlists/');
+      setPlaylists(res.data);
+    } catch (err) {
+      console.error('Error fetching playlists:', err);
+    }
+  };
+
   useEffect(() => {
     fetchTracks();
+    fetchPlaylists();
   }, [search]);
 
   const handlePlayPause = (trackId, isOnline = false) => {
@@ -52,14 +76,51 @@ function TrackList() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, isOnline = false) => {
     try {
-      await axiosInstance.delete(`http://localhost:8000/api/tracks/${id}/`, {
+      const url = isOnline
+        ? `http://localhost:8000/api/online-tracks/${id}/`
+        : `http://localhost:8000/api/tracks/${id}/`;
+
+      await axiosInstance.delete(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchTracks();
     } catch (err) {
       console.error('Error deleting track:', err);
+    }
+  };
+
+  const handleFavorite = async (track, isOnline = false) => {
+    try {
+      const payload = isOnline
+        ? { online_track: track.id }
+        : { track: track.id };
+
+      await axiosInstance.post('http://localhost:8000/api/favorites/', payload)
+      alert(`Added "${track.title}" to favorites!`);
+    } catch (err) {
+      console.error('Error adding favorite:', err);
+    }
+  };
+
+  const handleAddToPlaylist = (track, isOnline = false) => {
+    setSelectedTrackToAdd({ track, isOnline });
+  };
+
+  const confirmAddToPlaylist = async (playlistId) => {
+    try {
+      const { track, isOnline } = selectedTrackToAdd;
+      const payload = isOnline
+        ? { online_track: track.id, playlist: playlistId }
+        : { track: track.id, playlist: playlistId };
+
+      await axiosInstance.post('api/playlist-items/', payload);
+      alert(`Added "${track.title}" to playlist successfully!`);
+      setSelectedTrackToAdd(null);
+    } catch (err) {
+      console.error('Error adding to playlist:', err);
+      alert('Track may already be in the playlist or an error occurred.');
     }
   };
 
@@ -82,26 +143,33 @@ function TrackList() {
 
   return (
     <div className="container py-4">
-      <nav className="d-flex justify-content-between align-items-center mb-4">
-  <div>
-    <button className="btn btn-outline-primary me-2" onClick={() => window.location.href = '/dashboard'}>
-      Dashboard
-    </button>
-    <button className="btn btn-outline-secondary me-2" onClick={() => window.location.href = '/search'}>
-      Search
-    </button>
-  </div>
-  <button
-    className="btn btn-outline-danger"
-    onClick={() => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('access');
-      window.location.href = '/login';
-    }}
-  >
-    Logout
-  </button>
-</nav>
+      <motion.nav className="d-flex justify-content-between align-items-center mb-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}>
+        <div>
+          <button className="btn btn-outline-primary me-2" onClick={() => window.location.href = '/dashboard'}>
+            Dashboard
+          </button>
+          <button className="btn btn-outline-primary me-2" onClick={() => window.location.href = '/playlist'}>
+            My Playlist
+          </button>
+          <button className="btn btn-outline-primary me-2" onClick={() => window.location.href = '/upload'}>
+            Upload Tracks
+          </button>
+          <button className="btn btn-outline-primary me-2" onClick={() => window.location.href = '/search'}>
+            Web Search
+          </button>
+        </div>
+        <button className="btn btn-outline-danger" onClick={() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('access');
+          window.location.href = '/login';
+        }}>
+          Logout
+        </button>
+      </motion.nav>
+
       <h2 className="text-center mb-4">🎧 My Music Library</h2>
 
       <div className="row mb-3">
@@ -135,11 +203,26 @@ function TrackList() {
                   src={track.audio_file}
                   onPause={() => setPlayingTrackId(null)}
                 />
-                <div className="d-flex justify-content-between mt-auto pt-2">
-                  <button className="btn btn-outline-primary btn-sm" onClick={() => handlePlayPause(track.id)}>
+                <div className="d-flex justify-content-between mt-auto pt-2 flex-wrap">
+                  <button className="btn btn-outline-primary btn-sm me-1 mb-1" onClick={() => handlePlayPause(track.id)}>
                     {playingTrackId === track.id ? 'Pause' : 'Play'}
                   </button>
-                  <div className="btn-group">
+
+                  <button
+                    className="btn btn-outline-success btn-sm me-1 mb-1"
+                    onClick={() => handleAddToPlaylist(track, false)}
+                  >
+                    Add to Playlist
+                  </button>
+
+                  <button
+                    className="btn btn-outline-warning btn-sm me-1 mb-1"
+                    onClick={() => handleFavorite(track, false)}
+                  >
+                    Favorite
+                  </button>
+
+                  <div className="btn-group mb-1">
                     <button
                       className="btn btn-outline-secondary btn-sm"
                       onClick={() =>
@@ -152,7 +235,7 @@ function TrackList() {
                     >
                       Edit
                     </button>
-                    <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(track.id)}>
+                    <button className="btn btn-outline-danger btn-sm" onClick={() => handleDelete(track.id, false)}>
                       Delete
                     </button>
                   </div>
@@ -179,17 +262,68 @@ function TrackList() {
                   src={track.stream_url}
                   onPause={() => setPlayingTrackId(null)}
                 />
-                <button
-                  className="btn btn-outline-success btn-sm mt-auto"
-                  onClick={() => handlePlayPause(`online-${track.id}`, true)}
-                >
-                  {playingTrackId === `online-${track.id}` ? 'Pause' : 'Play'}
-                </button>
+                <div className="d-flex justify-content-between mt-auto pt-2 flex-wrap">
+                  <button
+                    className="btn btn-outline-primary btn-sm me-1 mb-1"
+                    onClick={() => handlePlayPause(`online-${track.id}`, true)}
+                  >
+                    {playingTrackId === `online-${track.id}` ? 'Pause' : 'Play'}
+                  </button>
+
+                  <button
+                    className="btn btn-outline-success btn-sm me-1 mb-1"
+                    onClick={() => handleAddToPlaylist(track, true)}
+                  >
+                    Add to Playlist
+                  </button>
+
+                  <button
+                    className="btn btn-outline-warning btn-sm me-1 mb-1"
+                    onClick={() => handleFavorite(track, true)}
+                  >
+                    Favorite
+                  </button>
+
+                  <button
+                    className="btn btn-outline-danger btn-sm mb-1"
+                    onClick={() => handleDelete(track.id, true)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {selectedTrackToAdd && (
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Select Playlist</h5>
+                <button type="button" className="btn-close" onClick={() => setSelectedTrackToAdd(null)}></button>
+              </div>
+              <div className="modal-body">
+                {playlists.length === 0 ? (
+                  <p>No playlists found.</p>
+                ) : (
+                  playlists.map((playlist) => (
+                    <button
+                      key={playlist.id}
+                      className="btn btn-outline-primary w-100 mb-2"
+                      onClick={() => confirmAddToPlaylist(playlist.id)}
+                    >
+                      {playlist.name}
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editModal && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -208,7 +342,7 @@ function TrackList() {
               </div>
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={() => setEditModal(null)}>Cancel</button>
-                <button className="btn btn-primary" onClick={handleEdit}>Save</button>
+                <button className="btn btn-primary" onClick={handleEdit}>Save Changes</button>
               </div>
             </div>
           </div>

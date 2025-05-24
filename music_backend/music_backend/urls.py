@@ -19,16 +19,18 @@ from django.urls import path , include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('music.urls')),
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    
 ]
 
 if settings.DEBUG:

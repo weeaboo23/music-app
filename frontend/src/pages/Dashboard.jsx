@@ -40,6 +40,9 @@ function Dashboard() {
             <button className="dashboard-btn btn btn-warning text-start px-4 py-3 shadow" onClick={() => navigate('/upload')}>
               <i className="fas fa-upload fa-lg me-3"></i> Upload Your Music
             </button>
+             <button className="dashboard-btn btn btn-warning text-start px-4 py-3 shadow" onClick={() => navigate('/playlist')}>
+              <i className="fas fa-upload fa-lg me-3"></i> PlayLists
+            </button>
           </div>
         </div>
       </div>

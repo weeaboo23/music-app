@@ -7,6 +7,8 @@ import TrackList from './pages/TrackList';
 import Search from './pages/Search';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
+import PlaylistPage from './pages/PlayList';
+
 
 function App() {
   return (
@@ -19,11 +21,13 @@ function App() {
         <Route path="/upload" element={<UploadTrack />} />
         <Route path="/tracks" element={<TrackList />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/playlist" element={<PlaylistPage />} />
       </Routes>
     </Router>
   );
 }
 
 export default App;
+
 
 
